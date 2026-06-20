@@ -164,6 +164,13 @@ class SystemMonitor:
 
     def _loop(self):
         """Boucle principale de collecte."""
+        try:
+            import pythoncom
+            pythoncom.CoInitialize()
+            _com_initialized = True
+        except Exception:
+            _com_initialized = False
+
         while self._running:
             try:
                 snap = self._collect()
@@ -178,6 +185,13 @@ class SystemMonitor:
             except Exception as e:
                 logger.error(f"Erreur collecte: {e}")
             time.sleep(self.interval)
+
+        if _com_initialized:
+            try:
+                import pythoncom
+                pythoncom.CoUninitialize()
+            except Exception:
+                pass
 
     def _collect(self) -> SystemSnapshot:
         """Collecte toutes les métriques système."""
