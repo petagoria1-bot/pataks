@@ -88,12 +88,25 @@ class DetectionWorker(QThread):
         self.config = SystemConfig()
 
     def run(self):
+        _com_ok = False
         try:
             import pythoncom
             pythoncom.CoInitialize()
+            _com_ok = True
         except Exception:
             pass
 
+        try:
+            self._run_detectors()
+        finally:
+            if _com_ok:
+                try:
+                    import pythoncom
+                    pythoncom.CoUninitialize()
+                except Exception:
+                    pass
+
+    def _run_detectors(self):
         detectors = [
             ("cpu",  self._detect_cpu),
             ("gpu",  self._detect_gpu),

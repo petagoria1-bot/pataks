@@ -279,10 +279,9 @@ class MiniProgressBar(QWidget):
         self.setFixedHeight(4)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-        # Animation smooth
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._animate)
-        self._timer.start(16)  # 60fps
+        self._timer.start(16)
 
     def set_value(self, value: float):
         self._value = max(0, min(100, value))
@@ -292,6 +291,19 @@ class MiniProgressBar(QWidget):
         if abs(diff) > 0.1:
             self._animated_value += diff * 0.15
             self.update()
+
+    def hideEvent(self, event):
+        self._timer.stop()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        if not self._timer.isActive():
+            self._timer.start(16)
+        super().showEvent(event)
+
+    def closeEvent(self, event):
+        self._timer.stop()
+        super().closeEvent(event)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -336,6 +348,19 @@ class CircularGauge(QWidget):
         self._anim_timer = QTimer(self)
         self._anim_timer.timeout.connect(self._tick)
         self._anim_timer.start(16)
+
+    def hideEvent(self, event):
+        self._anim_timer.stop()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        if not self._anim_timer.isActive():
+            self._anim_timer.start(16)
+        super().showEvent(event)
+
+    def closeEvent(self, event):
+        self._anim_timer.stop()
+        super().closeEvent(event)
 
     def set_value(self, value: float):
         self._value = max(0, min(100, value))
@@ -511,6 +536,19 @@ class GlowButton(QPushButton):
     def leaveEvent(self, event):
         self._hover = False
         super().leaveEvent(event)
+
+    def hideEvent(self, event):
+        self._timer.stop()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        if not self._timer.isActive():
+            self._timer.start(16)
+        super().showEvent(event)
+
+    def closeEvent(self, event):
+        self._timer.stop()
+        super().closeEvent(event)
 
     def paintEvent(self, event):
         painter = QPainter(self)

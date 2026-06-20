@@ -188,6 +188,19 @@ class ScoreBarWidget(QWidget):
         self._timer.timeout.connect(self._tick)
         self._timer.start(16)
 
+    def hideEvent(self, event):
+        self._timer.stop()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        if not self._timer.isActive():
+            self._timer.start(16)
+        super().showEvent(event)
+
+    def closeEvent(self, event):
+        self._timer.stop()
+        super().closeEvent(event)
+
     def set_score(self, score: int, summary: str):
         self._score = score
         self._summary = summary

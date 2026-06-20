@@ -45,39 +45,46 @@ class TitleBar(QWidget):
 
     def _build(self):
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 0, 6, 0)
+        layout.setContentsMargins(16, 0, 4, 0)
         layout.setSpacing(0)
 
-        # Indicateur live
-        dot = QLabel("●")
-        dot.setFont(QFont("Arial", 8))
-        dot.setStyleSheet(f"color: {Colors.CRIMSON}; background: transparent;")
-        layout.addWidget(dot)
+        # Logo minimaliste
+        lbl_logo = QLabel("PATAKS")
+        lbl_logo.setFont(Typography.display(13))
+        lbl_logo.setStyleSheet(f"color: {Colors.SILVER_BRIGHT}; background: transparent; letter-spacing: 1px;")
+        layout.addWidget(lbl_logo)
 
-        lbl = QLabel("  PATAKS  ·  by Petagoria")
-        lbl.setFont(Typography.label(9))
-        lbl.setStyleSheet(f"color: {Colors.SILVER_DIM}; background: transparent; letter-spacing: 2px;")
-        layout.addWidget(lbl)
+        sep = QLabel("  ·  ")
+        sep.setStyleSheet(f"color: {Colors.SILVER_GHOST}; background: transparent;")
+        layout.addWidget(sep)
+
+        lbl_sub = QLabel("by Petagoria")
+        lbl_sub.setFont(Typography.label(8))
+        lbl_sub.setStyleSheet(f"color: {Colors.CRIMSON}; background: transparent; letter-spacing: 2px;")
+        layout.addWidget(lbl_sub)
         layout.addStretch()
 
-        for symbol, action, is_close in [
-            ("⎯", self._win.showMinimized, False),
-            ("□", self._toggle_maximize, False),
-            ("✕", self._win.close, True),
+        for symbol, tooltip, action, is_close in [
+            ("−", "Réduire",      self._win.showMinimized, False),
+            ("□", "Agrandir",     self._toggle_maximize,   False),
+            ("✕", "Fermer",       self._win.close,         True),
         ]:
             btn = QPushButton(symbol)
-            btn.setFixedSize(36, 36)
-            btn.setFont(QFont("Segoe UI Symbol", 11))
+            btn.setFixedSize(46, 36)
+            btn.setToolTip(tooltip)
+            btn.setFont(QFont("Segoe UI Symbol", 10))
             btn.clicked.connect(action)
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setStyleSheet(f"""
                 QPushButton {{
                     background: transparent;
                     color: {Colors.SILVER_DIM};
                     border: none;
+                    font-size: 14px;
                 }}
                 QPushButton:hover {{
-                    background: {'#C0150F' if is_close else Colors.BG_HOVER};
-                    color: white;
+                    background: {'rgba(192,21,15,0.85)' if is_close else Colors.BG_HOVER};
+                    color: {'white' if is_close else Colors.SILVER_BRIGHT};
                 }}
             """)
             layout.addWidget(btn)
@@ -180,21 +187,20 @@ class AppShell(QWidget):
     def _navigate(self, key: str):
         if key in self._pages:
             self._stack.setCurrentWidget(self._pages[key])
-
-    def _refresh_metrics(self):
-        snap = self._monitor.get_snapshot()
-        current = self._stack.currentWidget()
-        if current == self._page_dashboard:
-            self._page_dashboard.update_metrics(snap)
-        elif current == self._page_monitor:
-            self._page_monitor.update_metrics(snap)
-
-    def _navigate(self, key: str):
-        if key in self._pages:
-            self._stack.setCurrentWidget(self._pages[key])
-            # Refresh sécurité quand on y accède
             if key == "security":
                 self._page_security.refresh()
+
+    def _refresh_metrics(self):
+        try:
+            snap = self._monitor.get_snapshot()
+            current = self._stack.currentWidget()
+            if current == self._page_dashboard:
+                self._page_dashboard.update_metrics(snap)
+            elif current == self._page_monitor:
+                self._page_monitor.update_metrics(snap)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Erreur refresh métriques: {e}")
 
     def _placeholder(self, title: str, subtitle: str) -> QWidget:
         from ui.components.widgets import SectionHeader
@@ -213,8 +219,8 @@ class AppShell(QWidget):
         return w
 
     def stop(self):
-        self._monitor.stop()
         self._ui_timer.stop()
+        self._monitor.stop()
 
 
 # ─── MAIN WINDOW ──────────────────────────────────────────────────────────────
@@ -310,33 +316,49 @@ class MainWindow(QMainWindow):
 
     def _build_infobar(self, config: SystemConfig) -> QWidget:
         bar = QWidget()
-        bar.setFixedHeight(38)
+        bar.setFixedHeight(34)
         bar.setStyleSheet(f"""
             background: {Colors.BG_SURFACE};
             border-bottom: 1px solid {Colors.SILVER_GHOST};
         """)
         layout = QHBoxLayout(bar)
         layout.setContentsMargins(16, 0, 16, 0)
-        layout.setSpacing(14)
+        layout.setSpacing(0)
 
-        chips = [
-            config.cpu.name.split("@")[0].strip()[:40] if config.cpu.detected else "CPU: —",
-            config.gpu.name[:35] if config.gpu.detected else "GPU: —",
-            config.ram.name[:25] if config.ram.detected else "RAM: —",
-            config.os.name[:30] if config.os.detected else "Windows",
-        ]
-        for i, chip in enumerate(chips):
-            lbl = QLabel(chip)
+        chips = []
+        if config.cpu.detected:
+            chips.append(("🖥", config.cpu.name.split("@")[0].strip()[:36]))
+        if config.gpu.detected:
+            chips.append(("🎮", config.gpu.name[:32]))
+        if config.ram.detected:
+            chips.append(("💾", config.ram.name[:20]))
+        chips.append(("🪟", config.os.name[:28] if config.os.detected else "Windows"))
+
+        for i, (icon, text) in enumerate(chips):
+            if i > 0:
+                sep = QWidget()
+                sep.setFixedSize(1, 16)
+                sep.setStyleSheet(f"background: {Colors.SILVER_GHOST}; margin: 0 12px;")
+                layout.addWidget(sep)
+                layout.addSpacing(12)
+
+            lbl_icon = QLabel(icon)
+            lbl_icon.setFont(QFont("Segoe UI Emoji", 9))
+            lbl_icon.setStyleSheet("background: transparent; padding-right: 4px;")
+            layout.addWidget(lbl_icon)
+
+            lbl = QLabel(text)
             lbl.setFont(Typography.body(9))
             lbl.setStyleSheet(f"color: {Colors.SILVER_DIM}; background: transparent;")
             layout.addWidget(lbl)
-            if i < len(chips) - 1:
-                sep = QWidget()
-                sep.setFixedSize(1, 14)
-                sep.setStyleSheet(f"background: {Colors.SILVER_GHOST};")
-                layout.addWidget(sep)
 
         layout.addStretch()
+
+        # Indicateur admin
+        lbl_admin = QLabel("● ADMIN")
+        lbl_admin.setFont(Typography.label(8))
+        lbl_admin.setStyleSheet(f"color: {Colors.SUCCESS}; background: transparent; letter-spacing: 1px; margin-right: 12px;")
+        layout.addWidget(lbl_admin)
 
         # Horloge
         self._clock = QLabel("--:--:--")
@@ -360,19 +382,43 @@ class MainWindow(QMainWindow):
     def _setup_tray(self):
         self._tray = QSystemTrayIcon(self)
         menu = QMenu()
-        menu.addAction("Afficher PATAKS", self.show)
+        menu.addAction("Afficher PATAKS", self._show_from_tray)
         menu.addSeparator()
-        menu.addAction("Quitter", self.close)
+        menu.addAction("Quitter PATAKS", self._quit_app)
         self._tray.setContextMenu(menu)
-        self._tray.activated.connect(
-            lambda r: (self.show(), self.raise_()) if r == QSystemTrayIcon.ActivationReason.DoubleClick else None
-        )
+        self._tray.activated.connect(self._on_tray_activated)
         self._tray.show()
 
+    def _show_from_tray(self):
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
+    def _on_tray_activated(self, reason):
+        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+            self._show_from_tray()
+
+    def _quit_app(self):
+        self._force_quit = True
+        self.close()
+
     def closeEvent(self, event):
+        if not getattr(self, "_force_quit", False):
+            self.hide()
+            if hasattr(self, "_tray"):
+                self._tray.showMessage(
+                    "PATAKS",
+                    "PATAKS tourne en arrière-plan. Double-cliquez sur l'icône pour rouvrir.",
+                    QSystemTrayIcon.MessageIcon.Information,
+                    2000,
+                )
+            event.ignore()
+            return
+
         if self._app_shell:
             self._app_shell.stop()
-        self._tray.hide()
+        if hasattr(self, "_tray"):
+            self._tray.hide()
         logger.info("PATAKS fermé proprement.")
         event.accept()
 

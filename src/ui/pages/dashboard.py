@@ -27,9 +27,22 @@ class HealthScoreWidget(QWidget):
         self._animated = 100.0
         self.setFixedSize(160, 160)
 
-        timer = QTimer(self)
-        timer.timeout.connect(self._tick)
-        timer.start(16)
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._tick)
+        self._timer.start(16)
+
+    def hideEvent(self, event):
+        self._timer.stop()
+        super().hideEvent(event)
+
+    def showEvent(self, event):
+        if not self._timer.isActive():
+            self._timer.start(16)
+        super().showEvent(event)
+
+    def closeEvent(self, event):
+        self._timer.stop()
+        super().closeEvent(event)
 
     def set_score(self, score: int):
         self._score = score

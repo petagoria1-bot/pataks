@@ -16,11 +16,11 @@ from ui.theme import Colors, Typography, Spacing, Radius
 # Icônes SVG en unicode / emoji minimalistes (remplacer par SVG réels en prod)
 NAV_ITEMS = [
     ("boost",      "⚡",  "Booster mon PC",  "Gaming Mode 1-clic"),
-    ("analyze",    "◈",  "Analyse IA",      "Diagnostic système"),
-    ("dashboard",  "⬡",  "Dashboard",       "Métriques live"),
-    ("monitor",    "◉",  "Moniteur",        "Temps réel"),
-    ("security",   "◫",  "Sécurité",        "Backups & logs"),
-    ("settings",   "⚙",  "Paramètres",      "Configuration"),
+    ("analyze",    "◈",  "Analyse IA",       "Diagnostic système"),
+    ("dashboard",  "▦",  "Dashboard",        "Vue d'ensemble"),
+    ("monitor",    "◉",  "Moniteur",         "Graphiques live"),
+    ("security",   "■",  "Sécurité",         "Backups & audit"),
+    ("settings",   "✦",  "Paramètres",       "Configuration"),
 ]
 
 

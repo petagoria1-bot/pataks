@@ -52,22 +52,10 @@ class SplashScreen(QWidget):
         self._start_timers()
 
     def _setup_window(self):
-        self.setWindowFlags(
-            Qt.WindowType.FramelessWindowHint |
-            Qt.WindowType.WindowStaysOnTopHint |
-            Qt.WindowType.SplashScreen
-        )
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, False)
-        self.setFixedSize(1280, 800)
-
-        # Centrer
-        screen = QApplication.primaryScreen()
-        if screen:
-            geo = screen.availableGeometry()
-            self.move(
-                (geo.width() - self.width()) // 2,
-                (geo.height() - self.height()) // 2
-            )
+        # Le splash est un widget enfant de QMainWindow — pas de flags de fenêtre
+        # ni de taille/position fixe (le QMainWindow gère ça)
+        from PyQt6.QtWidgets import QSizePolicy
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     def _init_particles(self):
         """Génère des particules montantes."""

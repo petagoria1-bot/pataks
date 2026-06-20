@@ -327,7 +327,8 @@ class SettingsPage(QWidget):
 
     def _on_startup_changed(self, state: int):
         """Active/désactive le lancement au démarrage."""
-        enabled = state == Qt.CheckState.Checked.value
+        enabled = (state == Qt.CheckState.Checked.value or
+                   state == int(Qt.CheckState.Checked))
         try:
             key = winreg.OpenKey(
                 winreg.HKEY_CURRENT_USER, PATAKS_REG_KEY,
@@ -335,9 +336,13 @@ class SettingsPage(QWidget):
             )
             if enabled:
                 import sys
-                exe_path = sys.executable
+                # Mode frozen (exe PyInstaller) ou mode script Python
+                if getattr(sys, "frozen", False):
+                    exe_path = sys.argv[0]
+                else:
+                    exe_path = sys.executable
                 winreg.SetValueEx(key, PATAKS_APP_NAME, 0, winreg.REG_SZ,
-                                  f'"{exe_path}" "{__file__}"')
+                                  f'"{exe_path}"')
             else:
                 try:
                     winreg.DeleteValue(key, PATAKS_APP_NAME)

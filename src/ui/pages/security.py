@@ -181,7 +181,8 @@ class SecurityPage(QWidget):
         self._backup_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         self._backup_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
         self._backup_table.setColumnWidth(3, 130)
-        self._backup_table.setFixedHeight(200)
+        self._backup_table.setMinimumHeight(160)
+        self._backup_table.setMaximumHeight(280)
         self._backup_table.verticalHeader().setVisible(False)
         layout.addWidget(self._backup_table)
 
@@ -197,7 +198,8 @@ class SecurityPage(QWidget):
         self._audit_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         self._audit_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         self._audit_table.verticalHeader().setVisible(False)
-        self._audit_table.setFixedHeight(250)
+        self._audit_table.setMinimumHeight(180)
+        self._audit_table.setMaximumHeight(400)
         layout.addWidget(self._audit_table)
 
         layout.addStretch()
