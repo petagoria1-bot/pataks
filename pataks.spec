@@ -1,0 +1,106 @@
+# -*- mode: python ; coding: utf-8 -*-
+"""
+PATAKS by Petagoria — PyInstaller Build Spec
+Produit : PATAKS.exe (UAC admin, no console, icône premium)
+"""
+
+block_cipher = None
+
+a = Analysis(
+    ['main.py'],
+    pathex=['src'],
+    binaries=[],
+    datas=[
+        ('resources', 'resources'),
+        ('src', 'src'),
+    ],
+    hiddenimports=[
+        'psutil',
+        'psutil._pswindows',
+        'wmi',
+        'win32api',
+        'win32con',
+        'win32process',
+        'win32security',
+        'win32service',
+        'win32serviceutil',
+        'pywintypes',
+        'winreg',
+        'PyQt6',
+        'PyQt6.QtWidgets',
+        'PyQt6.QtCore',
+        'PyQt6.QtGui',
+        'PyQt6.sip',
+        'PyQt6.QtNetwork',
+        'ui',
+        'ui.theme',
+        'ui.main_window',
+        'ui.components',
+        'ui.components.sidebar',
+        'ui.components.widgets',
+        'ui.pages',
+        'ui.pages.splash',
+        'ui.pages.detection',
+        'ui.pages.boost',
+        'ui.pages.dashboard',
+        'ui.pages.analyze',
+        'ui.pages.optimize',
+        'ui.pages.monitor',
+        'ui.pages.security',
+        'ui.pages.settings',
+        'core',
+        'core.system_monitor',
+        'core.ai_analyzer',
+        'core.gaming_optimizer',
+        'security',
+        'security.security_manager',
+        'utils',
+        'utils.config',
+    ],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[
+        'tkinter',
+        'matplotlib',
+        'numpy',
+        'scipy',
+        'pandas',
+        'PIL',
+        'cv2',
+        'tensorflow',
+        'torch',
+        '_tkinter',
+    ],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='PATAKS',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,              # ← PAS de fenêtre console
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    uac_admin=True,             # ← Demande droits admin automatiquement
+    icon='resources/icons/pataks.ico',
+    version='version_info.txt',
+)

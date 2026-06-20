@@ -1,0 +1,25 @@
+# Build
+dist/
+build/
+*.spec.bak
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Logs & data utilisateur
+*.log
+*.jsonl
+
+# IDE
+.vscode/
+.idea/
+*.suo
+
+# OS
+Thumbs.db
+.DS_Store

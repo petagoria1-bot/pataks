@@ -1,0 +1,22 @@
+# PATAKS by Petagoria — Dependencies
+# Python 3.12+ required
+# Windows only
+
+# ── UI ──────────────────────────────────────────────────────────────────────
+PyQt6>=6.6.0
+PyQt6-Qt6>=6.6.0
+PyQt6-sip>=13.6.0
+
+# ── System Monitoring ───────────────────────────────────────────────────────
+psutil>=5.9.8
+WMI>=1.5.1               # Windows Management Instrumentation
+
+# ── Windows APIs ────────────────────────────────────────────────────────────
+pywin32>=306             # win32api, win32con, win32process, etc.
+
+# ── Build ───────────────────────────────────────────────────────────────────
+pyinstaller>=6.3.0
+
+# ── Dev / Tests ─────────────────────────────────────────────────────────────
+pytest>=7.4.0
+pytest-qt>=4.2.0
